@@ -1,41 +1,26 @@
-name: Build Tauri Android APK (pnpm)
+name: Build Flutter Gomoku APK
 on:
   workflow_dispatch:
 
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          node-version: 22
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-linux-android,armv7-linux-androideabi
-
-      - name: Setup Android SDK & NDK
-        uses: android-actions/setup-android@v3
-        with:
-          ndk-version: r27
-
-      - name: Install dependencies (pnpm)
-        run: pnpm install
-
-      - name: Tauri Android build debug
-        run: pnpm tauri android build --debug
-
-      - name: Upload APK artifact
+          channel: stable
+          
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Build APK
+        run: flutter build apk --release --target-platform android-arm64
+      
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: gomuko-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/debug/app-debug.apk
+          name: gomoku-flutter-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
